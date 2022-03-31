@@ -22,18 +22,20 @@ class CloudStorageBucketClient:
         try:
             self.storage_client.create_bucket(bucket_name, location=location)
             logging.info('Bucket created successfully')
+
             return 'OK', 201
         except HTTPError as http_error:
-            logging.debug(f'HTTPError error occurred: {http_error}')
+            logging.debug(f'HTTPError occurred: {http_error}')
             return 'Creating new bucket failed'
 
     def retrieve_bucket(self, bucket_name):
         try:
             bucket = self.storage_client.get_bucket(bucket_name)
             logging.info('Bucket retrieved successfully')
+
             return bucket
         except HTTPError as http_error:
-            logging.debug(f'HTTPError error occurred: {http_error}')
+            logging.debug(f'HTTPError occurred: {http_error}')
             return f'Retrieving bucket with name {bucket_name} failed'
 
     def retrieve_buckets(self, max_results=None, prefix=None):
@@ -41,7 +43,18 @@ class CloudStorageBucketClient:
             buckets = self.storage_client.list_buckets(max_results=max_results,
                                                        prefix=prefix)
             logging.info('Buckets retrieved successfully')
+
             return buckets
         except HTTPError as http_error:
-            logging.debug(f'HTTPError error occurred: {http_error}')
-            return f'Retrieving buckets failed'
+            logging.debug(f'HTTPError occurred: {http_error}')
+            return 'Retrieving buckets failed'
+
+    def delete_bucket(self, bucket_name, force_deletion=False):
+        try:
+            bucket = self.retrieve_bucket(bucket_name)
+            bucket.delete(force=force_deletion)
+
+            return 'Deleted', 204
+        except HTTPError as http_error:
+            logging.debug(f'HTTPError occurred: {http_error}')
+            return f'Deleting bucket with name {bucket_name} failed'
