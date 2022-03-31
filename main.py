@@ -1,17 +1,10 @@
-# Imports the Google Cloud client library
-import os
-from google.cloud import storage
-from constants import GCP_CREDS
+from utils.gcp_bucket import CloudStorageBucketClient
 
-os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = GCP_CREDS
+if __name__ == '__main__':
+    client = CloudStorageBucketClient()
 
-# Instantiates a client
-storage_client = storage.Client()
+    name = 'someshit_bucket'
 
-# The name for the new bucket
-bucket_name = 'bucket_from_crud'
+    client.create_bucket(name)
 
-# Creates the new bucket
-bucket = storage_client.create_bucket(bucket_name)
-
-print('Bucket {} created.'.format(bucket.name))
+    print('Success')
