@@ -1,8 +1,9 @@
 import os
 import logging
-from urllib.error import HTTPError
 
 from google.cloud import storage
+from google.api_core.exceptions import GoogleAPIError
+from google.auth.exceptions import DefaultCredentialsError
 
 from utils.constants import GCP_CREDS, GCP_LOCATION_EU
 
@@ -12,7 +13,10 @@ logging.basicConfig(level=logging.DEBUG)
 
 class CloudStorageBucketClient:
     def __init__(self):
-        self.__storage_client = storage.Client()
+        try:
+            self.__storage_client = storage.Client()
+        except DefaultCredentialsError as auth_error:
+            logging.debug(f'Authorization error: {auth_error}')
 
     @property
     def storage_client(self):
@@ -24,8 +28,13 @@ class CloudStorageBucketClient:
             logging.info('Bucket created successfully')
 
             return 'OK', 201
-        except HTTPError as http_error:
-            logging.debug(f'HTTPError occurred: {http_error}')
+        except GoogleAPIError as google_api_error:
+            logging.debug(f'GoogleAPIError occurred: {google_api_error}')
+
+            return 'Creating new bucket failed'
+        except ValueError as value_error:
+            logging.debug(f'Invalid name: {value_error}')
+
             return 'Creating new bucket failed'
 
     def retrieve_bucket(self, bucket_name):
@@ -34,8 +43,9 @@ class CloudStorageBucketClient:
             logging.info('Bucket retrieved successfully')
 
             return bucket
-        except HTTPError as http_error:
-            logging.debug(f'HTTPError occurred: {http_error}')
+        except GoogleAPIError as google_api_error:
+            logging.debug(f'GoogleAPIError occurred: {google_api_error}')
+
             return f'Retrieving bucket with name {bucket_name} failed'
 
     def retrieve_buckets(self, max_results=None, prefix=None):
@@ -45,8 +55,9 @@ class CloudStorageBucketClient:
             logging.info('Buckets retrieved successfully')
 
             return buckets
-        except HTTPError as http_error:
-            logging.debug(f'HTTPError occurred: {http_error}')
+        except GoogleAPIError as google_api_error:
+            logging.debug(f'GoogleAPIError occurred: {google_api_error}')
+
             return 'Retrieving buckets failed'
 
     def delete_bucket(self, bucket_name, force_deletion=False):
@@ -55,6 +66,7 @@ class CloudStorageBucketClient:
             bucket.delete(force=force_deletion)
 
             return 'Deleted', 204
-        except HTTPError as http_error:
-            logging.debug(f'HTTPError occurred: {http_error}')
+        except GoogleAPIError as google_api_error:
+            logging.debug(f'GoogleAPIError occurred: {google_api_error}')
+
             return f'Deleting bucket with name {bucket_name} failed'
