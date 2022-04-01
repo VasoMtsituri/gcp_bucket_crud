@@ -13,7 +13,7 @@ logging.basicConfig(level=logging.DEBUG)
 
 class CloudStorageBucketClient:
     """
-    Client class used for connectiong Google Cloud Storage
+    Client class used for connecting Google Cloud Storage
     """
     def __init__(self):
         try:
@@ -28,6 +28,7 @@ class CloudStorageBucketClient:
     def create_bucket(self, bucket_name, location=GCP_LOCATION_EU):
         """
         Creates the bucket in the Google cloud storage
+
         :param bucket_name: name of the bucket to be created
         :param location: physical location of servers in which
         this bucket must be
@@ -35,7 +36,8 @@ class CloudStorageBucketClient:
         """
         try:
             self.storage_client.create_bucket(bucket_name, location=location)
-            logging.info('Bucket created successfully')
+            logging.debug(f'Bucket with name {bucket_name} created'
+                          f' successfully')
 
             return 'OK', 201
         except GoogleAPIError as google_api_error:
@@ -56,7 +58,8 @@ class CloudStorageBucketClient:
         """
         try:
             bucket = self.storage_client.get_bucket(bucket_name)
-            logging.info('Bucket retrieved successfully')
+            logging.debug(f'Bucket with name {bucket_name} retrieved'
+                          f' successfully')
 
             return bucket
         except GoogleAPIError as google_api_error:
@@ -79,7 +82,7 @@ class CloudStorageBucketClient:
         try:
             buckets = self.storage_client.list_buckets(max_results=max_results,
                                                        prefix=prefix)
-            logging.info('Buckets retrieved successfully')
+            logging.info(f'{len(buckets)} bucket(s) retrieved successfully')
 
             return buckets
         except GoogleAPIError as google_api_error:
@@ -92,9 +95,10 @@ class CloudStorageBucketClient:
         Deletes the bucket with the given name
 
         :param bucket_name: name of the bucket to be deleted
-        :param force_deletion: flag whether to force to delete non-empty
+        :param force_deletion: flag whether to force deleting non-empty
         bucket or not
-        :return: #TODO ???
+        :return: deleted status with code 204 if successful otherwise
+        raises exception
         """
         try:
             bucket = self.retrieve_bucket(bucket_name)
@@ -103,6 +107,8 @@ class CloudStorageBucketClient:
                 raise ValueError
 
             bucket.delete(force=force_deletion)
+            logging.debug(f'Bucket with name {bucket_name} deleted'
+                          f' successfully')
 
             return 'Deleted', 204
         except GoogleAPIError as google_api_error:
