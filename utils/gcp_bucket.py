@@ -13,7 +13,9 @@ logging.basicConfig(level=logging.DEBUG)
 
 class CloudStorageBucketClient:
     """
-    Client class used for connecting Google Cloud Storage
+    Client class used for connecting Google Cloud Storage and does bucket
+    level operations
+
     """
     def __init__(self):
         try:

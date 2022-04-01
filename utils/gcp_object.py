@@ -53,9 +53,9 @@ class CloudStorageBucketObject:
 
         return 'Downloaded', 200
 
-    def retrieve_objects(self, bucket_name):
+    def retrieve_objects_as_blobs(self, bucket_name):
         """
-        Download all the objects from the given bucket
+        Gets all the objects from the given bucket as Blob objects
 
         :param bucket_name: name of the bucket in which objects are located
         :return: Blob objects
@@ -67,6 +67,23 @@ class CloudStorageBucketObject:
 
         return objects
 
+    def retrieve_objects_and_download(self, bucket_name, directory):
+        """
+        Download all the objects from the given bucket
+
+        :param bucket_name: name of the bucket in which objects are located
+        :param directory: path where all the objects will be downloaded
+        :return: Blob objects
+
+        """
+        objects = self.storage_client.storage_client.list_blobs(bucket_name)
+
+        objects = [blob.download_to_filename(f'{directory}/{blob.name}')
+                   for blob in objects]
+        logging.debug(f'{len(objects)} object(s) downloaded successfully')
+
+        return 'Downloaded', 200
+
     def retrieve_object_names_only(self, bucket_name):
         """
         Lists all the objects names in the given bucket
@@ -74,7 +91,7 @@ class CloudStorageBucketObject:
         :param bucket_name:  name of the bucket in which objects are located
         :return: Blob objects' names
         """
-        objects = self.retrieve_objects(bucket_name)
+        objects = self.retrieve_objects_as_blobs(bucket_name)
         names = [blob.name for blob in objects]
 
         return names
