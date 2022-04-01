@@ -15,8 +15,8 @@ class CloudStorageBucketClient:
     """
     Client class used for connecting Google Cloud Storage and does bucket
     level operations
-
     """
+
     def __init__(self):
         try:
             self.__storage_client = storage.Client()
@@ -36,6 +36,7 @@ class CloudStorageBucketClient:
         this bucket must be
         :return: recently created Bucket object
         """
+
         try:
             self.storage_client.create_bucket(bucket_name, location=location)
             logging.debug(f'Bucket with name {bucket_name} created'
@@ -58,6 +59,7 @@ class CloudStorageBucketClient:
         :param bucket_name:  name of the bucket to be retrieved
         :return: Bucket object with the given name
         """
+
         try:
             bucket = self.storage_client.get_bucket(bucket_name)
             logging.debug(f'Bucket with name {bucket_name} retrieved'
@@ -81,6 +83,7 @@ class CloudStorageBucketClient:
         :param prefix: buckets with this prefix
         :return: all the buckets available in that particular project
         """
+
         try:
             buckets = self.storage_client.list_buckets(max_results=max_results,
                                                        prefix=prefix)
@@ -102,6 +105,7 @@ class CloudStorageBucketClient:
         :return: deleted status with code 204 if successful otherwise
         raises exception
         """
+
         try:
             bucket = self.retrieve_bucket(bucket_name)
 

@@ -31,6 +31,7 @@ class CloudStorageBucketObject:
         :param object_path: path of the object to be uploaded
         :return: status Created with code 201 if successful
         """
+
         bucket = self.storage_client.retrieve_bucket(bucket_name)
         blob = bucket.blob(object_name)
         blob.upload_from_filename(object_path)
@@ -47,6 +48,7 @@ class CloudStorageBucketObject:
         :param object_path: path of the object (after download)
         :return: status Downloaded with code 200 if successful
         """
+
         bucket = self.storage_client.retrieve_bucket(bucket_name)
         blob = bucket.blob(object_name)
         blob.download_to_filename(object_path)
@@ -59,8 +61,8 @@ class CloudStorageBucketObject:
 
         :param bucket_name: name of the bucket in which objects are located
         :return: Blob objects
-
         """
+
         objects = self.storage_client.storage_client.list_blobs(bucket_name)
 
         objects = [blob for blob in objects]
@@ -74,8 +76,8 @@ class CloudStorageBucketObject:
         :param bucket_name: name of the bucket in which objects are located
         :param directory: path where all the objects will be downloaded
         :return: Blob objects
-
         """
+
         objects = self.storage_client.storage_client.list_blobs(bucket_name)
 
         objects = [blob.download_to_filename(f'{directory}/{blob.name}')
@@ -95,3 +97,18 @@ class CloudStorageBucketObject:
         names = [blob.name for blob in objects]
 
         return names
+
+    def delete_object(self, bucket_name, object_name):
+        """
+        Deletes object from the given bucket
+
+        :param bucket_name: name of the bucket in which object is located
+        :param object_name: name of the object to be deleted
+        :return: status Deleted with code 204 if successful
+        """
+
+        bucket = self.storage_client.retrieve_bucket(bucket_name)
+        blob = bucket.blob(object_name)
+        blob.delete()
+
+        return 'Deleted', 204
