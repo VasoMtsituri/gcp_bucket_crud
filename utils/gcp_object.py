@@ -23,6 +23,58 @@ class CloudStorageBucketObject:
         return self.__storage_client
 
     def create_object(self, bucket_name, object_name, object_path):
+        """
+        Uploads object to the bucket given
+
+        :param bucket_name: name of the bucket in which object be uploaded
+        :param object_name: name of the object in the bucket (after upload)
+        :param object_path: path of the object to be uploaded
+        :return: status Created with code 201 if successful
+        """
         bucket = self.storage_client.retrieve_bucket(bucket_name)
         blob = bucket.blob(object_name)
         blob.upload_from_filename(object_path)
+
+        return 'Created', 201
+
+    def retrieve_object(self, bucket_name, object_name, object_path):
+        """
+        Download the particular object from the given bucket
+
+        :param bucket_name: name of the bucket in which object is located
+        :param object_name: name of the object in the bucket
+         to be downloaded
+        :param object_path: path of the object (after download)
+        :return: status Downloaded with code 200 if successful
+        """
+        bucket = self.storage_client.retrieve_bucket(bucket_name)
+        blob = bucket.blob(object_name)
+        blob.download_to_filename(object_path)
+
+        return 'Downloaded', 200
+
+    def retrieve_objects(self, bucket_name):
+        """
+        Download all the objects from the given bucket
+
+        :param bucket_name: name of the bucket in which objects are located
+        :return: Blob objects
+
+        """
+        objects = self.storage_client.storage_client.list_blobs(bucket_name)
+
+        objects = [blob for blob in objects]
+
+        return objects
+
+    def retrieve_object_names_only(self, bucket_name):
+        """
+        Lists all the objects names in the given bucket
+
+        :param bucket_name:  name of the bucket in which objects are located
+        :return: Blob objects' names
+        """
+        objects = self.retrieve_objects(bucket_name)
+        names = [blob.name for blob in objects]
+
+        return names
