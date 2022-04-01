@@ -1,4 +1,4 @@
 GCP_CREDS = '/home/vaso/PycharmProjects/' \
-            'gcp_bucket_crud/seismic-hope-345015-b2b175fc756f.json'
+            'gcp_bucket_crud/seismic-hope-345015-517105226f66.json'
 
 GCP_LOCATION_EU = 'eu'

@@ -1,6 +1,5 @@
-from utils.gcp_bucket import CloudStorageBucketClient
+from utils.gcp_object import CloudStorageBucketObject
 
 if __name__ == '__main__':
-    client = CloudStorageBucketClient()
-
-    client.delete_bucket('-')
+    s = CloudStorageBucketObject()
+    s.create_object('', '', '')
