@@ -1,5 +1,6 @@
 import logging
 
+from google.api_core.exceptions import GoogleAPIError
 from google.auth.exceptions import DefaultCredentialsError
 
 from utils.gcp_bucket import CloudStorageBucketClient
@@ -108,7 +109,14 @@ class CloudStorageBucketObject:
         """
 
         bucket = self.storage_client.retrieve_bucket(bucket_name)
-        blob = bucket.blob(object_name)
-        blob.delete()
 
-        return 'Deleted', 204
+        if type(bucket) != str:
+            try:
+                blob = bucket.blob(object_name)
+                blob.delete()
+
+                return 'Deleted', 204
+            except GoogleAPIError as google_api_error:
+                logging.debug(f'GoogleAPIError occurred: {google_api_error}')
+
+                return f'Deleting object with name {object_name} failed'

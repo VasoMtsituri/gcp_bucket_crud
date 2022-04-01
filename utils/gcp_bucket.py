@@ -109,7 +109,7 @@ class CloudStorageBucketClient:
         try:
             bucket = self.retrieve_bucket(bucket_name)
 
-            if type(bucket) == 'str':
+            if type(bucket) == str:
                 raise ValueError
 
             bucket.delete(force=force_deletion)
