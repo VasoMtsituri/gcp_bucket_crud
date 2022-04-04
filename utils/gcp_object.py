@@ -36,6 +36,8 @@ class CloudStorageBucketObject:
 
             try:
                 blob.upload_from_filename(object_path)
+                logging.debug(f'Object with name {object_name} created'
+                              f' successfully')
 
                 return 'Created', 201
             except GoogleAPIError as google_api_error:
