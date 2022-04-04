@@ -51,6 +51,8 @@ class CloudStorageBucketClient:
             logging.debug(f'Invalid name: {value_error}')
 
             return 'Creating new bucket failed'
+        except Exception as exception:
+            logging.debug(f'Some other error  occurred: {exception}')
 
     def retrieve_bucket(self, bucket_name):
         """
