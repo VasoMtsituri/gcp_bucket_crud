@@ -73,11 +73,11 @@ class CloudStorageBucketClient:
         except GoogleAPIError as google_api_error:
             logging.debug(f'GoogleAPIError occurred: {google_api_error}')
 
-            return f'Retrieving bucket with name {bucket_name} failed'
+            return 'Retrieving a bucket failed'
         except ValueError as value_error:
             logging.debug(f'Invalid name: {value_error}')
 
-            return f'Retrieving bucket with name {bucket_name} failed'
+            return 'Retrieving a bucket failed'
         except Exception as exception:
             logging.debug(f'Some other error occurred: {exception}')
 
