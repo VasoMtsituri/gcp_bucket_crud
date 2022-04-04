@@ -1,7 +1,6 @@
 import logging
 
 from google.api_core.exceptions import GoogleAPIError
-from google.auth.exceptions import DefaultCredentialsError
 
 from utils.gcp_bucket import CloudStorageBucketClient
 
