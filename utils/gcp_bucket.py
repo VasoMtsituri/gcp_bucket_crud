@@ -52,7 +52,9 @@ class CloudStorageBucketClient:
 
             return 'Creating new bucket failed'
         except Exception as exception:
-            logging.debug(f'Some other error  occurred: {exception}')
+            logging.debug(f'Some other error occurred: {exception}')
+
+            return 'Creating new bucket failed'
 
     def retrieve_bucket(self, bucket_name):
         """
@@ -76,6 +78,10 @@ class CloudStorageBucketClient:
             logging.debug(f'Invalid name: {value_error}')
 
             return f'Retrieving bucket with name {bucket_name} failed'
+        except Exception as exception:
+            logging.debug(f'Some other error occurred: {exception}')
+
+            return 'Retrieving a bucket failed'
 
     def retrieve_buckets(self, max_results=None, prefix=None):
         """
@@ -89,13 +95,21 @@ class CloudStorageBucketClient:
         try:
             buckets = self.storage_client.list_buckets(max_results=max_results,
                                                        prefix=prefix)
-            logging.info(f'{len(buckets)} bucket(s) retrieved successfully')
+            names = [bucket.name for bucket in buckets]
+            logging.info(f'{len(names)} bucket(s) retrieved successfully')
 
-            return buckets
+            if max_results:
+                logging.debug(f'Max result filtering applied: {max_results}')
+
+            return names
         except GoogleAPIError as google_api_error:
             logging.debug(f'GoogleAPIError occurred: {google_api_error}')
 
             return 'Retrieving buckets failed'
+        except Exception as exception:
+            logging.debug(f'Some other error occurred: {exception}')
+
+            return 'Retrieving the buckets failed'
 
     def delete_bucket(self, bucket_name, force_deletion=False):
         """
@@ -108,21 +122,25 @@ class CloudStorageBucketClient:
         raises exception
         """
 
-        try:
-            bucket = self.retrieve_bucket(bucket_name)
+        bucket = self.retrieve_bucket(bucket_name)
 
-            if type(bucket) == str:
-                raise ValueError
+        if type(bucket) != str:
+            try:
+                bucket.delete(force=force_deletion)
+                logging.debug(f'Bucket with name {bucket_name} deleted'
+                              f' successfully')
 
-            bucket.delete(force=force_deletion)
-            logging.debug(f'Bucket with name {bucket_name} deleted'
-                          f' successfully')
+                return 'Deleted', 204
+            except GoogleAPIError as google_api_error:
+                logging.debug(f'GoogleAPIError occurred: {google_api_error}')
 
-            return 'Deleted', 204
-        except GoogleAPIError as google_api_error:
-            logging.debug(f'GoogleAPIError occurred: {google_api_error}')
+                return 'Deleting a bucket failed'
+            except AttributeError:
+                logging.debug(f'Invalid name or'
+                              f' Bucket with that name does not exist')
 
-            return f'Deleting bucket with name {bucket_name} failed'
-        except AttributeError:
-            logging.debug(f'Invalid name or'
-                          f' Bucket with that name does not exist')
+                return 'Deleting a bucket failed'
+            except Exception as exception:
+                logging.debug(f'Some other error occurred: {exception}')
+
+                return 'Deleting a bucket failed'
