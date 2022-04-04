@@ -34,10 +34,18 @@ class CloudStorageBucketObject:
         """
 
         bucket = self.storage_client.retrieve_bucket(bucket_name)
-        blob = bucket.blob(object_name)
-        blob.upload_from_filename(object_path)
 
-        return 'Created', 201
+        if type(bucket) != str:
+            blob = bucket.blob(object_name)
+
+            try:
+                blob.upload_from_filename(object_path)
+
+                return 'Created', 201
+            except FileNotFoundError as not_found:
+                logging.debug(not_found)
+
+                return 'Uploading object to the bucket failed'
 
     def retrieve_object(self, bucket_name, object_name, object_path):
         """
@@ -51,10 +59,22 @@ class CloudStorageBucketObject:
         """
 
         bucket = self.storage_client.retrieve_bucket(bucket_name)
-        blob = bucket.blob(object_name)
-        blob.download_to_filename(object_path)
 
-        return 'Downloaded', 200
+        if type(bucket) != str:
+            blob = bucket.blob(object_name)
+
+            try:
+                blob.download_to_filename(object_path)
+
+                return 'Downloaded', 200
+            except GoogleAPIError as google_api_error:
+                logging.debug(f'GoogleAPIError occurred: {google_api_error}')
+
+                return f'Retrieving object with name {object_name} failed'
+            except FileNotFoundError as not_found:
+                logging.debug(not_found)
+
+                return f'Retrieving object with name {object_name} failed'
 
     def retrieve_objects_as_blobs(self, bucket_name):
         """
@@ -64,11 +84,20 @@ class CloudStorageBucketObject:
         :return: Blob objects
         """
 
-        objects = self.storage_client.storage_client.list_blobs(bucket_name)
+        try:
+            objects = self.storage_client.storage_client.list_blobs(
+                bucket_name)
+            objects = [blob for blob in objects]
 
-        objects = [blob for blob in objects]
+            return objects
+        except GoogleAPIError as google_api_error:
+            logging.debug(f'GoogleAPIError occurred: {google_api_error}')
 
-        return objects
+            return 'Retrieving objects from bucket failed'
+        except ValueError as value_error:
+            logging.debug(f'Invalid name: {value_error}')
+
+            return 'Retrieving objects from bucket failed'
 
     def retrieve_objects_and_download(self, bucket_name, directory):
         """
@@ -79,13 +108,28 @@ class CloudStorageBucketObject:
         :return: Blob objects
         """
 
-        objects = self.storage_client.storage_client.list_blobs(bucket_name)
+        try:
+            objects = self.storage_client.storage_client.list_blobs(
+                bucket_name)
 
-        objects = [blob.download_to_filename(f'{directory}/{blob.name}')
-                   for blob in objects]
-        logging.debug(f'{len(objects)} object(s) downloaded successfully')
+            objects = [blob.download_to_filename(f'{directory}/{blob.name}')
+                       for blob in objects]
+            logging.debug(f'{len(objects)} object(s) downloaded successfully')
 
-        return 'Downloaded', 200
+            return 'Downloaded', 200
+        except GoogleAPIError as google_api_error:
+            logging.debug(f'GoogleAPIError occurred: {google_api_error}')
+
+            return 'Retrieving objects from bucket failed'
+        except ValueError as value_error:
+            logging.debug(f'Invalid name: {value_error}')
+
+            return 'Retrieving objects from bucket failed'
+
+        except FileNotFoundError as not_found:
+            logging.debug(not_found)
+
+            return 'Retrieving objects from bucket failed'
 
     def retrieve_object_names_only(self, bucket_name):
         """
@@ -95,9 +139,11 @@ class CloudStorageBucketObject:
         :return: Blob objects' names
         """
         objects = self.retrieve_objects_as_blobs(bucket_name)
-        names = [blob.name for blob in objects]
 
-        return names
+        if type(objects) != str:
+            names = [blob.name for blob in objects]
+
+            return names
 
     def delete_object(self, bucket_name, object_name):
         """
