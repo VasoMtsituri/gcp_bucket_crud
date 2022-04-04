@@ -42,6 +42,10 @@ class CloudStorageBucketObject:
                 blob.upload_from_filename(object_path)
 
                 return 'Created', 201
+            except GoogleAPIError as google_api_error:
+                logging.debug(f'GoogleAPIError occurred: {google_api_error}')
+
+                return 'Uploading object to the bucket failed'
             except FileNotFoundError as not_found:
                 logging.debug(not_found)
 
@@ -125,7 +129,6 @@ class CloudStorageBucketObject:
             logging.debug(f'Invalid name: {value_error}')
 
             return 'Retrieving objects from bucket failed'
-
         except FileNotFoundError as not_found:
             logging.debug(not_found)
 
@@ -138,6 +141,7 @@ class CloudStorageBucketObject:
         :param bucket_name:  name of the bucket in which objects are located
         :return: Blob objects' names
         """
+
         objects = self.retrieve_objects_as_blobs(bucket_name)
 
         if type(objects) != str:
