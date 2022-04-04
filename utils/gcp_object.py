@@ -14,10 +14,7 @@ class CloudStorageBucketObject:
     """
 
     def __init__(self):
-        try:
-            self.__storage_client = CloudStorageBucketClient()
-        except DefaultCredentialsError as auth_error:
-            logging.debug(f'Authorization error: {auth_error}')
+        self.__storage_client = CloudStorageBucketClient()
 
     @property
     def storage_client(self):
@@ -50,6 +47,10 @@ class CloudStorageBucketObject:
                 logging.debug(not_found)
 
                 return 'Uploading object to the bucket failed'
+            except Exception as exception:
+                logging.debug(f'Some other error occurred: {exception}')
+
+                return 'Uploading object to the bucket failed'
 
     def retrieve_object(self, bucket_name, object_name, object_path):
         """
@@ -79,6 +80,10 @@ class CloudStorageBucketObject:
                 logging.debug(not_found)
 
                 return f'Retrieving object with name {object_name} failed'
+            except Exception as exception:
+                logging.debug(f'Some other error occurred: {exception}')
+
+                return 'Retrieving object from the bucket failed'
 
     def retrieve_objects_as_blobs(self, bucket_name):
         """
@@ -97,11 +102,15 @@ class CloudStorageBucketObject:
         except GoogleAPIError as google_api_error:
             logging.debug(f'GoogleAPIError occurred: {google_api_error}')
 
-            return 'Retrieving objects from bucket failed'
+            return 'Retrieving object from the bucket failed'
         except ValueError as value_error:
             logging.debug(f'Invalid name: {value_error}')
 
-            return 'Retrieving objects from bucket failed'
+            return 'Retrieving object from the bucket failed'
+        except Exception as exception:
+            logging.debug(f'Some other error occurred: {exception}')
+
+            return 'Retrieving object from the bucket failed'
 
     def retrieve_objects_and_download(self, bucket_name, directory):
         """
@@ -124,15 +133,19 @@ class CloudStorageBucketObject:
         except GoogleAPIError as google_api_error:
             logging.debug(f'GoogleAPIError occurred: {google_api_error}')
 
-            return 'Retrieving objects from bucket failed'
+            return 'Retrieving object from the bucket failed'
         except ValueError as value_error:
             logging.debug(f'Invalid name: {value_error}')
 
-            return 'Retrieving objects from bucket failed'
+            return 'Retrieving object from the bucket failed'
         except FileNotFoundError as not_found:
             logging.debug(not_found)
 
-            return 'Retrieving objects from bucket failed'
+            return 'Retrieving object from the bucket failed'
+        except Exception as exception:
+            logging.debug(f'Some other error occurred: {exception}')
+
+            return 'Retrieving object from the bucket failed'
 
     def retrieve_object_names_only(self, bucket_name):
         """
@@ -169,4 +182,8 @@ class CloudStorageBucketObject:
             except GoogleAPIError as google_api_error:
                 logging.debug(f'GoogleAPIError occurred: {google_api_error}')
 
-                return f'Deleting object with name {object_name} failed'
+                return f'Deleting object failed'
+            except Exception as exception:
+                logging.debug(f'Some other error occurred: {exception}')
+
+                return f'Deleting object failed'
