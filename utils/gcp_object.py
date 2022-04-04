@@ -49,7 +49,7 @@ class CloudStorageBucketObject:
 
     def retrieve_object(self, bucket_name, object_name, object_path):
         """
-        Download the particular object from the given bucket
+        Downloads the particular object from the given bucket
 
         :param bucket_name: name of the bucket in which object is located
         :param object_name: name of the object in the bucket
@@ -101,7 +101,7 @@ class CloudStorageBucketObject:
 
     def retrieve_objects_and_download(self, bucket_name, directory):
         """
-        Download all the objects from the given bucket
+        Downloads all the objects from the given bucket
 
         :param bucket_name: name of the bucket in which objects are located
         :param directory: path where all the objects will be downloaded
